@@ -1,77 +1,52 @@
-// import { lazy,Suspense } from "react";
-// import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom'
-// import './App.css'
+import react from 'react'
+import { countAtom, evenSelector } from './store/atoms/count'
+import { RecoilRoot, useRecoilState,useRecoilValue, useSetRecoilState } from 'recoil'
 
-// const Dashboard = lazy(() => import('./components/Dashboard'))
-// const Landing = lazy(() => import('./components/Landing'))
-
-// function App() {
-  
-//   // Suspense API use to fetch asynchronously data
-//   return (
-//     <div>
-//       <BrowserRouter>
-//         <Appbar />
-//         <Routes>
-//             <Route path="/dashboard" element={<Suspense fallback={"loading..."}><Dashboard /></Suspense>} />
-//             <Route path="/" element={<Suspense fallback={"loading..."}><Landing /></Suspense>} />
-//         </Routes>
-//       </BrowserRouter>
-//     </div>
-//   )
-// }
-// //use navigae should be inside browserRouter component that is what is done here
-// function Appbar() {
-//   const navigate = useNavigate();
-
-//   return <div>
-//       <div>
-//         <button onClick={() => {
-//           navigate("/");
-//         }}>Landing page</button>
-
-//         <button onClick={() => {
-//           navigate("/dashboard");
-//         }}>Dashboard</button>
-
-//       </div>
-//   </div>
-// }
-
-// export default App
-
-import React, { useState } from 'react'
-import { CountContext } from '../../context';
 
 const App = () => {
-  const [count, setcount] = useState(0);
+ 
   //wrap anyone who wants to use the teleported value inside provider
   return (
     <div>
-      <CountContext.Provider value={count}>
-         <Count setcount={setcount}/>
-      </CountContext.Provider>
-      
-      
+      {/* // similar as provider in usecontext for rendering */}
+      <RecoilRoot>
+
+         <Count />
+      </RecoilRoot>
     </div>
   )
 }
 
-function Count({setcount}) {
+function Count() {
   return <div>
     <CountRenderer/>
-    <Buttons setcount={setcount}/>
+    <EvenCountRenderer/>
+    <Buttons />
+  </div>
+}
+function CountRenderer(){
+  const count=useRecoilValue(countAtom);
+  return <div>
+    {count}
   </div>
 }
 
-function Buttons({count,setcount}) {
+function EvenCountRenderer(){
+  const count=useRecoilValue(evenSelector);
+  return <div>
+    {count%2==0?"It is even":null}
+  </div>
+}
+
+function Buttons() {
+  const setcount=useSetRecoilState(countAtom);
   return <div>
     <button onClick={() => {
-       setcount(count+1)
+       setcount(count=>count+1)
     }}>Increase</button>
 
     <button onClick={() => {
-       setcount(count-1)
+       setcount(count=>count-1)
     }}>Decrease</button>
   </div>
 }
